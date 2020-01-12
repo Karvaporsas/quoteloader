@@ -65,7 +65,7 @@ module.exports = {
             } else {
                 console.log('Success');
                 const quoteData = JSON.parse(body);
-                if (Object.keys(quoteData).length === 0) {
+                if (Object.keys(quoteData).length === 0 || (quoteData.result && typeof quoteData.result.quote === 'object')) {
                     resolve({status: 0, quotes: [], message: 'No quotes'});
                 } else {
                     var results = quoteData.result;
