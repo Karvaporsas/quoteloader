@@ -20,8 +20,9 @@ exports.handler = (event, context) => {
 
     loadHandler.load(STANDS4, event).then((results) => {
         console.log('Loading was successful');
-        storeHander.store(results.quotes).then(() => {
-            context.succeed('Quotes handled');
+        storeHander.store(results.quotes).then((insertResult) => {
+            var amt = (insertResult.quotes ? insertResult.quotes.length : 0);
+            context.succeed(`${amt} quotes handled`);
         }).catch((e) => {
             console.log('Failed to store quotes');
             console.log(e);

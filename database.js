@@ -44,7 +44,6 @@ module.exports = {
                     console.log(err);
                     reject(err);
                 } else {
-                    console.log('success');
                     resolve(quote);
                 }
             });

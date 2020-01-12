@@ -65,11 +65,14 @@ module.exports = {
             } else {
                 console.log('Success');
                 const quoteData = JSON.parse(body);
-                var results = quoteData.result;
+                if (Object.keys(quoteData).length === 0) {
+                    resolve({status: 0, quotes: [], message: 'No quotes'});
+                } else {
+                    var results = quoteData.result;
+                    if (!Array.isArray(results)) results = [quoteData.result];
 
-                if (!Array.isArray(results)) results = [quoteData.result];
-
-                resolve({status: 1, quotes: _parseResults(results), message: 'Got quotes'});
+                    resolve({status: 1, quotes: _parseResults(results), message: `Got ${results.length} quotes`});
+                }
             }
         }).catch(e => {
             console.log('Error getting quote');
