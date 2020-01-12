@@ -1,0 +1,17 @@
+{
+  "name": "quoteloader",
+  "version": "1.0.0",
+  "description": "Loads quotes from interwebz",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Touko Hjelt",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.601.0",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.5",
+    "uuid": "^3.3.3"
+  }
+}
