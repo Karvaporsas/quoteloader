@@ -7,6 +7,7 @@ const UID = process.env.UID;
 const TOKENID = process.env.TOKENID;
 const DEBUG_MODE = process.env.DEBUG_MODE === 'ON';
 const RESULT_FORMAT = 'json';
+const AUTHOR_QUERY = process.env.AUTHOR_QUERY || '';
 
 function _parseResults(results) {
     var parsedResults = [];
@@ -47,7 +48,8 @@ module.exports = {
                 queryString = '';
                 break;
             case 'AUTHOR':
-                queryString = `&query=${data.query}`;
+                var q = data.query || AUTHOR_QUERY;
+                queryString = `&query=${q}`;
                 break;
             default:
                 queryString = '';
