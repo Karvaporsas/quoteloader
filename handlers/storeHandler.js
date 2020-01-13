@@ -2,7 +2,7 @@
 /*jshint esversion: 6 */
 'use strict';
 
-const database = require('./database');
+const database = require('../database');
 const DEBUG_MODE = process.env.DEBUG_MODE === 'ON';
 
 module.exports = {

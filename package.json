@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "del quoteloadercore.zip",
-    "build": "7z a quoteloadercore.zip loaders *.js",
+    "build": "7z a quoteloadercore.zip loaders handlers *.js",
     "deploy": "aws lambda update-function-code --function-name QuoteLoader --zip-file fileb://quoteloadercore.zip --publish",
     "chaindeploy": "npm run clean && npm run build && npm run deploy"
   },

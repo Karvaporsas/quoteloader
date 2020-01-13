@@ -2,8 +2,7 @@
 /*jshint esversion: 6 */
 'use strict';
 
-const loadHandler = require('./loadHandler');
-const storeHander = require('./storeHandler');
+const commands = require('./commands');
 const STANDS4 = 'STANDS4';
 /**
  * Basic AWS Lambda handler.
@@ -17,18 +16,10 @@ exports.handler = (event, context) => {
     const standardResponse = {
         statusCode: 200,
     };
+    var command = event.command;
 
-    loadHandler.load(STANDS4, event).then((results) => {
-        console.log('Loading was successful');
-        storeHander.store(results.quotes).then((insertResult) => {
-            var amt = (insertResult.quotes ? insertResult.quotes.length : 0);
-            context.succeed(`${amt} quotes handled`);
-        }).catch((e) => {
-            console.log('Failed to store quotes');
-            console.log(e);
-            context.fail(e);
-        });
-
+    commands.process(command, STANDS4, event).then((result) => {
+        context.succeed(result);
     }).catch((e) => {
         console.log('Error while loading');
         console.log(e);
