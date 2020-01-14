@@ -13,7 +13,9 @@ module.exports = {
             case 'refine':
                 return refineHandler.refine(data);
             default:
-                break;
+                return new Promise((resolve, reject) => {
+                    reject('Unknown comand');
+                });
         }
     },
 };
