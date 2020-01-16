@@ -36,7 +36,7 @@ module.exports = {
 
                     quotes.each(function (i, elem) {
                         var quoteText = $(this).text().trim();
-                        var quoteAuthor = $(this).children('.authorOrTitle').text().trim();
+                        var quoteAuthor = $(this).children('.authorOrTitle').text().replace(',', '').trim();
                         //Quote has quotation marks around it and propably something unwanted after last. Getting rid of those
                         const firstMark = quoteText.indexOf('“');
                         const lastMark = quoteText.lastIndexOf('”');
