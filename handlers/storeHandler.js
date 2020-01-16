@@ -10,6 +10,11 @@ module.exports = {
         if (DEBUG_MODE) {
             console.log('starting to store quotes');
         }
+        if(!quotes || !quotes.length) {
+            return new Promise((resolve, reject) => {
+                resolve({status: 1, message: 'quotes inserted', quotes: 0});
+            });
+        }
 
         return database.insertQuotes(quotes);
     }

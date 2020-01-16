@@ -17,8 +17,9 @@ exports.handler = (event, context) => {
         statusCode: 200,
     };
     var command = event.command;
+    var loader = event.loader || STANDS4;
 
-    commands.process(command, STANDS4, event).then((result) => {
+    commands.process(command, loader, event).then((result) => {
         context.succeed(result);
     }).catch((e) => {
         console.log('Error while loading');

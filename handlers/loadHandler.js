@@ -4,12 +4,16 @@
 
 const stands4Loader = require('../loaders/stands4Loader');
 const storeHandler = require('./storeHandler');
+const goodreadsLoader = require('../loaders/goodreadsLoader');
 
 function _load(source, data) {
     return new Promise((resolve, reject) => {
         switch (source) {
             case 'STANDS4':
                 stands4Loader.load(data, resolve, reject);
+                break;
+            case 'goodreads':
+                goodreadsLoader.load(data, resolve, reject);
                 break;
             default:
                 reject({status: 0, message: 'No matching source given'});

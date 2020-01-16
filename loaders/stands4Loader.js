@@ -66,12 +66,14 @@ module.exports = {
                 reject(error);
             } else {
                 const quoteData = JSON.parse(body);
+
+                console.log(quoteData);
                 if (Object.keys(quoteData).length === 0 || (quoteData.result && typeof quoteData.result.quote === 'object')) {
                     resolve({status: 0, quotes: [], message: 'No quotes'});
                 } else {
                     var results = quoteData.result;
                     if (!Array.isArray(results)) results = [quoteData.result];
-
+                    console.log(results);
                     resolve({status: 1, quotes: _parseResults(results), message: `Got ${results.length} quotes`});
                 }
             }
