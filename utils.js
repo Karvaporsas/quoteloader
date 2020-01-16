@@ -2,6 +2,8 @@
 /*jshint esversion: 6 */
 'use strict';
 
+const crypto = require('crypto');
+
 module.exports = {
     /**
      * Performs scan for database. Results are sent to resolve function
@@ -41,5 +43,10 @@ module.exports = {
 
             dynamoDb.scan(params, chatScan);
         });
+    },
+    createHash(source) {
+        var hash = crypto.createHash('sha1');
+        hash.update(source);
+        return hash.digest('hex');
     }
 };

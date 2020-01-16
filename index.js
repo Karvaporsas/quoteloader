@@ -20,6 +20,7 @@ exports.handler = (event, context) => {
     var loader = event.loader || STANDS4;
 
     commands.process(command, loader, event).then((result) => {
+        console.log(result);
         context.succeed(result);
     }).catch((e) => {
         console.log('Error while loading');

@@ -5,6 +5,7 @@
 const AWS = require('aws-sdk');
 const utils = require('./utils');
 const QUOTES_TABLE = process.env.TABLE_QUOTES;
+const UTILS_TABLE = process.env.TABLE_UTILS;
 const DEBUG_MODE = process.env.DEBUG_MODE === 'ON';
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
@@ -60,6 +61,61 @@ module.exports = {
                     reject(err);
                 } else {
                     resolve();
+                }
+            });
+        });
+    },
+    getLoaderOptions(loaderName) {
+        return new Promise((resolve, reject) => {
+            var params = {
+                TableName: UTILS_TABLE,
+                Key: {
+                    name: loaderName
+                }
+            };
+
+            dynamoDb.get(params, function (err, result) {
+                if (err) {
+                    console.log(`Error getting options for ${loaderName}`);
+                    console.log(err);
+                    reject(err);
+                } else {
+                    if (result && result.Item) {
+                        resolve(result.Item);
+                    } else {
+                        reject();
+                    }
+                }
+            });
+        });
+    },
+    updateLoaderOptions(options) {
+        return new Promise((resolve, reject) => {
+            var params = {
+                TableName: UTILS_TABLE,
+                Key: {
+                    name: options.name
+                },
+                UpdateExpression: 'set #url_identifier = :url_identifier, #last_loaded_page = :last_loaded_page, #max_pages = :max_pages',
+                ExpressionAttributeNames: {
+                    '#url_identifier': 'url_identifier',
+                    '#last_loaded_page': 'last_loaded_page',
+                    '#max_pages': 'max_pages'
+                },
+                ExpressionAttributeValues: {
+                    ':url_identifier': options.url_identifier,
+                    ':last_loaded_page': options.last_loaded_page,
+                    ':max_pages': options.max_pages
+                }
+            };
+
+            dynamoDb.update(params, function (err, data) {
+                if (err) {
+                    console.log('Failed to update options');
+                    console.log(err);
+                    reject(err);
+                } else {
+                    resolve({status: 1, message: 'Success'});
                 }
             });
         });
