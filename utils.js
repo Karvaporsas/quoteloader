@@ -3,6 +3,7 @@
 'use strict';
 
 const crypto = require('crypto');
+const USE_LARGE_SCAN = process.env.USE_LARGE_SCAN === 'ON';
 
 module.exports = {
     /**
@@ -20,17 +21,20 @@ module.exports = {
                     console.log("error while scanning");
                     console.log(err);
                     reject(err);
+                    return;
                 } else if (!data) {
                     console.log("no data, no error");
                     resolve(allResults);
-                }
-                for (const item of data.Items) {
-                    allResults.push(item);
+                    return;
+                } else {
+                    for (const item of data.Items) {
+                        allResults.push(item);
+                    }
                 }
 
                 // continue scanning if we have more, because
                 // scan can retrieve a maximum of 1MB of data
-                if (typeof data.LastEvaluatedKey != "undefined") {
+                if (typeof data.LastEvaluatedKey != "undefined" && USE_LARGE_SCAN) {
                     console.log("Scanning for more...");
                     params.ExclusiveStartKey = data.LastEvaluatedKey;
                     dynamoDb.scan(params, chatScan);

@@ -20,7 +20,8 @@ function _parseResults(results) {
             author: r.author,
             quote: r.quote,
             id:id,
-            vendor: 'STANDS4'
+            vendor: 'STANDS4',
+            quote_length: r.quote.length || 0
         });
     }
 

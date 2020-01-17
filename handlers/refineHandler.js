@@ -22,5 +22,14 @@ module.exports = {
                 reject(e);
             });
         });
+    },
+    calculateLengths() {
+        return new Promise((resolve, reject) => {
+            database.setQuotesLenghtByBatch().then((result) => {
+                resolve(`${result} quotes refined`);
+            }).catch((e) => {
+                reject(e);
+            });
+        });
     }
 };

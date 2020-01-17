@@ -65,6 +65,59 @@ module.exports = {
             });
         });
     },
+    setQuotesLenghtByBatch() {
+        return new Promise((resolve, reject) => {
+            var params = {
+                TableName: QUOTES_TABLE,
+                ProjectionExpression: '#author, #id, #quote',
+                FilterExpression: 'attribute_not_exists(#quote_length)',
+                ExpressionAttributeNames: {
+                    '#author': 'author',
+                    '#id': 'id',
+                    '#quote': 'quote',
+                    '#quote_length': 'quote_length'
+                }
+            };
+
+            utils.performScan(dynamoDb, params).then((quotes) => {
+                var promises = [];
+
+                if (!quotes || !quotes.length) {
+                    reject('Nothing fetched');
+                }
+
+                for (const q of quotes) {
+                    var updateParams = {
+                        TableName: QUOTES_TABLE,
+                        Key: {
+                            author: q.author,
+                            id: q.id
+                        },
+                        UpdateExpression: `set #quote_length = :quote_length`,
+                        ExpressionAttributeNames: {
+                            '#quote_length': 'quote_length'
+                        },
+                        ExpressionAttributeValues:{
+                            ':quote_length': q.quote.length || 0
+                        }
+                    };
+                    promises.push(this.updateQuoteByParams(updateParams));
+                }
+
+                Promise.all(promises).then((results) => {
+                    resolve(results.length);
+                }).catch((e) => {
+                    console.log('Error updating quote lengths');
+                    console.log(e);
+                    reject(e);
+                });
+            }).catch((e) => {
+                console.log('Error scanning quotes');
+                console.log(e);
+                reject(e);
+            });
+        });
+    },
     getLoaderOptions(loaderName) {
         return new Promise((resolve, reject) => {
             var params = {

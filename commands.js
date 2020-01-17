@@ -12,6 +12,8 @@ module.exports = {
                 return loadHandler.load(source, data);
             case 'refine':
                 return refineHandler.refine(data);
+            case 'calculatelengths':
+                return refineHandler.calculateLengths();
             default:
                 return new Promise((resolve, reject) => {
                     reject('Unknown comand');
