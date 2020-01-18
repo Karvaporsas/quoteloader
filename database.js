@@ -118,6 +118,58 @@ module.exports = {
             });
         });
     },
+    setQuotesTimesPublishedByBatch() {
+        return new Promise((resolve, reject) => {
+            var params = {
+                TableName: QUOTES_TABLE,
+                ProjectionExpression: '#author, #id',
+                FilterExpression: 'attribute_not_exists(#times_published)',
+                ExpressionAttributeNames: {
+                    '#author': 'author',
+                    '#id': 'id',
+                    '#times_published': 'times_published'
+                }
+            };
+
+            utils.performScan(dynamoDb, params).then((quotes) => {
+                var promises = [];
+
+                if (!quotes || !quotes.length) {
+                    reject('Nothing fetched');
+                }
+
+                for (const q of quotes) {
+                    var updateParams = {
+                        TableName: QUOTES_TABLE,
+                        Key: {
+                            author: q.author,
+                            id: q.id
+                        },
+                        UpdateExpression: `set #times_published = :times_published`,
+                        ExpressionAttributeNames: {
+                            '#times_published': 'times_published'
+                        },
+                        ExpressionAttributeValues:{
+                            ':times_published': 0
+                        }
+                    };
+                    promises.push(this.updateQuoteByParams(updateParams));
+                }
+
+                Promise.all(promises).then((results) => {
+                    resolve(results.length);
+                }).catch((e) => {
+                    console.log('Error updating quote lengths');
+                    console.log(e);
+                    reject(e);
+                });
+            }).catch((e) => {
+                console.log('Error scanning quotes');
+                console.log(e);
+                reject(e);
+            });
+        });
+    },
     getLoaderOptions(loaderName) {
         return new Promise((resolve, reject) => {
             var params = {

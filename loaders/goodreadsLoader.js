@@ -44,7 +44,7 @@ module.exports = {
                             quoteText = quoteText.substring(firstMark + 1, lastMark);
                         }
                         var id = utils.createHash(quoteText);
-                        results.push({id: id, author: quoteAuthor, quote: quoteText, vendor: 'goodreads', quote_length: quoteText.length});
+                        results.push({id: id, author: quoteAuthor, quote: quoteText, vendor: 'goodreads', quote_length: quoteText.length, times_published: 0});
                     });
                     database.updateLoaderOptions(loaderOptions).then(() => {
                         resolve({status: 1, quotes: results, message: `Got ${results.length} quotes`});

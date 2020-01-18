@@ -14,6 +14,8 @@ module.exports = {
                 return refineHandler.refine(data);
             case 'calculatelengths':
                 return refineHandler.calculateLengths();
+            case 'initpublishedtimes':
+                return refineHandler.setTimesPublished();
             default:
                 return new Promise((resolve, reject) => {
                     reject('Unknown comand');

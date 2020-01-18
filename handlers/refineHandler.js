@@ -31,5 +31,14 @@ module.exports = {
                 reject(e);
             });
         });
+    },
+    setTimesPublished() {
+        return new Promise((resolve, reject) => {
+            database.setQuotesTimesPublishedByBatch().then((result) => {
+                resolve(`${result} quotes refined`);
+            }).catch((e) => {
+                reject(e);
+            });
+        });
     }
 };

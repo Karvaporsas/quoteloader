@@ -21,7 +21,8 @@ function _parseResults(results) {
             quote: r.quote,
             id:id,
             vendor: 'STANDS4',
-            quote_length: r.quote.length || 0
+            quote_length: r.quote.length || 0,
+            times_published: 0
         });
     }
 
