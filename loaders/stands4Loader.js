@@ -3,6 +3,7 @@
 'use strict';
 const rp = require('request-promise');
 const crypto = require('crypto');
+const database = require('../database');
 const UID = process.env.UID;
 const TOKENID = process.env.TOKENID;
 const DEBUG_MODE = process.env.DEBUG_MODE === 'ON';
@@ -30,28 +31,30 @@ function _parseResults(results) {
 }
 
 module.exports = {
-    load(data, resolve, reject) {
+    load(operation, resolve, reject) {
         if (DEBUG_MODE) {
-            console.log(data);
+            console.log(
+                operation
+            );
         }
 
-        if(!data.searchtype) {
-            reject({error: 'Called without searchtype'});
+        if(!operation.params.type) {
+            reject({error: 'Called without type'});
             return;
         }
 
         var options = {
             method: 'GET',
-            url: `https://www.stands4.com/services/v2/quotes.php?uid=${UID}&tokenid=${TOKENID}&searchtype=${data.searchtype}`
+            url: `https://www.stands4.com/services/v2/quotes.php?uid=${UID}&tokenid=${TOKENID}&searchtype=${operation.params.type}`
         };
 
         var queryString = '';
-        switch (data.searchtype) {
+        switch (operation.params.type) {
             case 'RANDOM':
                 queryString = '';
                 break;
             case 'AUTHOR':
-                var q = data.query || AUTHOR_QUERY;
+                var q = operation.params.query || AUTHOR_QUERY;
                 queryString = `&query=${q}`;
                 break;
             default:
@@ -74,8 +77,11 @@ module.exports = {
                 } else {
                     var results = quoteData.result;
                     if (!Array.isArray(results)) results = [quoteData.result];
-
-                    resolve({status: 1, quotes: _parseResults(results), message: `Got ${results.length} quotes`});
+                    database.updateOperation(operation).then(() => {
+                        resolve({status: 1, quotes: _parseResults(results), message: `Got ${results.length} quotes`});
+                    }).catch((e) => {
+                        reject(e);
+                    });
                 }
             }
         }).catch(e => {

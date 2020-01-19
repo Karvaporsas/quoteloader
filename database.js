@@ -5,7 +5,7 @@
 const AWS = require('aws-sdk');
 const utils = require('./utils');
 const QUOTES_TABLE = process.env.TABLE_QUOTES;
-const UTILS_TABLE = process.env.TABLE_UTILS;
+const OPERATIONS_TABLE = process.env.TABLE_OPERATIONS;
 const DEBUG_MODE = process.env.DEBUG_MODE === 'ON';
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
@@ -170,58 +170,88 @@ module.exports = {
             });
         });
     },
-    getLoaderOptions(loaderName) {
+    updateOperation(operation) {
         return new Promise((resolve, reject) => {
+            var d = new Date();
             var params = {
-                TableName: UTILS_TABLE,
+                TableName: OPERATIONS_TABLE,
                 Key: {
-                    name: loaderName
+                    name: operation.name
+                },
+                UpdateExpression: 'set #yr = :yr, #mon = :mon, #day = :day, #hour = :hour, #minute = :minute',
+                ExpressionAttributeNames: {
+                    '#yr': 'yr',
+                    '#mon': 'mon',
+                    '#day': 'day',
+                    '#hour': 'hour',
+                    '#minute': 'minute',
+                    '#params': 'params'
+                },
+                ExpressionAttributeValues: {
+                    ':yr': d.getFullYear(),
+                    ':mon': d.getMonth(),
+                    ':day': d.getDate(),
+                    ':hour': d.getHours(),
+                    ':minute': d.getMinutes()
                 }
             };
 
-            dynamoDb.get(params, function (err, result) {
+            for (const key in operation.params) {
+                if (operation.params.hasOwnProperty(key)) {
+                    const value = operation.params[key];
+                    const attributeNamePlaceholder = `#${key}`;
+                    const attributeValuePlaceholder = `:${key}`;
+
+                    params.UpdateExpression += `, #params.#${key} = :${key}`;
+                    params.ExpressionAttributeNames[attributeNamePlaceholder] = key;
+                    params.ExpressionAttributeValues[attributeValuePlaceholder] = value;
+                }
+            }
+            console.log(params);
+            dynamoDb.update(params, function (err, data) {
                 if (err) {
-                    console.log(`Error getting options for ${loaderName}`);
+                    console.log('Error while updating operation');
                     console.log(err);
                     reject(err);
                 } else {
-                    if (result && result.Item) {
-                        resolve(result.Item);
-                    } else {
-                        reject();
-                    }
+                    resolve({status: 1, message: 'success'});
                 }
             });
         });
     },
-    updateLoaderOptions(options) {
+    getOldestOperation(maintype) {
         return new Promise((resolve, reject) => {
             var params = {
-                TableName: UTILS_TABLE,
-                Key: {
-                    name: options.name
-                },
-                UpdateExpression: 'set #url_identifier = :url_identifier, #last_loaded_page = :last_loaded_page, #max_pages = :max_pages',
+                TableName: OPERATIONS_TABLE,
+                FilterExpression: '#maintype = :maintype and #active = :istrue',
                 ExpressionAttributeNames: {
-                    '#url_identifier': 'url_identifier',
-                    '#last_loaded_page': 'last_loaded_page',
-                    '#max_pages': 'max_pages'
+                    '#maintype': 'maintype',
+                    '#active': 'active'
                 },
                 ExpressionAttributeValues: {
-                    ':url_identifier': options.url_identifier,
-                    ':last_loaded_page': options.last_loaded_page,
-                    ':max_pages': options.max_pages
+                    ':maintype': maintype,
+                    ':istrue': true
                 }
             };
 
-            dynamoDb.update(params, function (err, data) {
-                if (err) {
-                    console.log('Failed to update options');
-                    console.log(err);
-                    reject(err);
+            utils.performScan(dynamoDb, params).then((operations) => {
+                if (!operations || !operations.length) {
+                    reject('No operations found');
                 } else {
-                    resolve({status: 1, message: 'Success'});
+                    for (const op of operations) {
+                        var d = new Date(op.yr, op.mon, op.day, op.hour, op.minute);
+                        op.lastRun = d;
+                    }
+                    operations.sort(function (a, b) {
+                        return a.lastRun - b.lastRun;
+                    });
+
+                    resolve(operations[0]);
                 }
+            }).catch((e) => {
+                console.log('Error getting operations');
+                console.log(e);
+                reject(e);
             });
         });
     },
@@ -238,7 +268,7 @@ module.exports = {
             var scanParams = {
                 TableName: QUOTES_TABLE,
                 ProjectionExpression: '#author, #id',
-                FilterExpression: `${conditionParamName} = ${conditionValueParam}`,
+                FilterExpression: `${conditionParamName} = ${conditionValueParam} and ${targetParamName} <> ${targetValueParam}`,
                 ExpressionAttributeNames: {
                     '#author': 'author',
                     '#id': 'id'
@@ -246,9 +276,12 @@ module.exports = {
                 ExpressionAttributeValues: {}
             };
             scanParams.ExpressionAttributeNames[conditionParamName] = refinement.condition;
+            scanParams.ExpressionAttributeNames[targetParamName] = refinement.target;
             scanParams.ExpressionAttributeValues[conditionValueParam] = refinement.conditionValue;
+            scanParams.ExpressionAttributeValues[targetValueParam] = refinement.targetValue;
 
             utils.performScan(dynamoDb, scanParams).then((quotes) => {
+                console.log(`Found ${quotes.length} quotes to refine`);
                 var promises = [];
 
                 for (const quote of quotes) {

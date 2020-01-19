@@ -3,7 +3,7 @@
 'use strict';
 
 const commands = require('./commands');
-const STANDS4 = 'STANDS4';
+
 /**
  * Basic AWS Lambda handler.
  * @param event Message from Telegram
@@ -17,9 +17,8 @@ exports.handler = (event, context) => {
         statusCode: 200,
     };
     var command = event.command;
-    var loader = event.loader || STANDS4;
 
-    commands.process(command, loader, event).then((result) => {
+    commands.process(command, event).then((result) => {
         console.log(result);
         context.succeed(result);
     }).catch((e) => {

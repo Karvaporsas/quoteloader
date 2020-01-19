@@ -6,10 +6,13 @@ const loadHandler = require('./handlers/loadHandler');
 const refineHandler = require('./handlers/refineHandler');
 
 module.exports = {
-    process(command, source, data) {
+    process(command, data) {
         switch (command) {
             case 'load':
-                return loadHandler.load(source, data);
+            case 'autoload':
+                return loadHandler.autoLoad();
+            case 'autorefine':
+                return refineHandler.autoRefine();
             case 'refine':
                 return refineHandler.refine(data);
             case 'calculatelengths':

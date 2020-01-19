@@ -5,6 +5,33 @@
 const database = require('../database');
 
 module.exports = {
+    autoRefine() {
+        return new Promise((resolve, reject) => {
+            database.getOldestOperation('refiner').then((operation) => {
+
+                database.refineByUpdate({
+                    target: operation.params.targetfield,
+                    targetValue: operation.params.targetvalue,
+                    condition: operation.params.idfield,
+                    conditionValue: operation.params.idfieldvalue
+                }).then((result) => {
+                    database.updateOperation(operation).then(() => {
+                        resolve(`Refined ${result} quotes with condition ${operation.params.idfield} on operation ${operation.name}`);
+                    }).catch((e) => {
+                        reject(e);
+                    });
+                }).catch((e) => {
+                    reject(e);
+                });
+            }).catch((e) => {
+                reject(e);
+            });
+        });
+    },
+    /**
+     * DEPRECATED
+     * @param {Object} data
+     */
     refine(data) {
         return new Promise((resolve, reject) => {
             var promises = [];
