@@ -6,6 +6,8 @@ const stands4Loader = require('../loaders/stands4Loader');
 const storeHandler = require('./storeHandler');
 const goodreadsLoader = require('../loaders/goodreadsLoader');
 const database = require('../database');
+const brainyLoader = require('../loaders/brainyquoteLoader');
+const mediawikiLoader = require('../loaders/mediawikiLoader');
 
 function _load(operation) {
     return new Promise((resolve, reject) => {
@@ -17,6 +19,12 @@ function _load(operation) {
             case 'goodreadsloader':
             case 'goodreads':
                 goodreadsLoader.load(operation, resolve, reject);
+                break;
+            case 'brainy':
+                brainyLoader.load(operation, resolve, reject);
+                break;
+            case 'mediawiki':
+                mediawikiLoader.load(operation, resolve, reject);
                 break;
             default:
                 reject({status: 0, message: 'No matching source given'});
@@ -33,7 +41,8 @@ module.exports = {
                     console.log('Loading was successful');
                     storeHandler.store(results.quotes).then((insertResult) => {
                         var amt = (insertResult.quotes ? insertResult.quotes.length : 0);
-                        resolve(`${amt} quotes loaded in operation ${operation.name} from ${operation.type}`);
+
+                        resolve(`${amt} quotes loaded in operation ${operation.name} from ${operation.type}. ${results.message}`);
                     }).catch((e) => {
                         reject(e);
                     });
