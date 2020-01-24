@@ -19,6 +19,8 @@ module.exports = {
                 return refineHandler.calculateLengths();
             case 'initpublishedtimes':
                 return refineHandler.setTimesPublished();
+            case 'insertFromFile':
+                return loadHandler.readFromFile();
             default:
                 return new Promise((resolve, reject) => {
                     reject('Unknown comand');

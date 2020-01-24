@@ -53,5 +53,23 @@ module.exports = {
                 reject(e);
             });
         });
+    },
+    readFromFile() {
+        return new Promise((resolve, reject) => {
+            const quotesToInsert = require('../quotesToInsert.json');
+            const jsonLoader = require('../loaders/jsonLoader');
+
+            jsonLoader.load(quotesToInsert.quotes).then((loadingResults) => {
+                storeHandler.store(loadingResults.quotes).then((insertResult) => {
+                    var amt = (insertResult.quotes ? insertResult.quotes.length : 0);
+
+                    resolve(`${amt} quotes loaded by jsonLoader`);
+                }).catch((e) => {
+                    reject(e);
+                });
+            }).catch((e) => {
+                reject(e);
+            });
+        });
     }
 };
