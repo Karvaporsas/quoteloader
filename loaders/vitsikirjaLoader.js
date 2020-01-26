@@ -34,8 +34,13 @@ module.exports = {
                 const quotes = $('.post-content.image-caption-format-1');
 
                 quotes.each(function (i, elem) {
-                    var quoteText = $(this).children('p:nth-child(3)').text().trim();
-                    console.log($(this).children('p'));
+                    var elemNr = 3;
+                    var quoteText = $(this).children(`p:nth-child(${elemNr++})`).text().trim();
+                    var nextPart = $(this).children(`p:nth-child(${elemNr++})`).text().trim();
+                    while(nextPart && nextPart.length > 3) {
+                        quoteText += ' ' + nextPart;
+                        nextPart = $(this).children(`p:nth-child(${elemNr++})`).text().trim();
+                    }
                     var quoteAuthor = 'Voi Vitsi';
                     //Quote has quotation marks around it and propably something unwanted after last. Getting rid of those
                     console.log(quoteText);
