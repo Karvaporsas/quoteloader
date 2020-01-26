@@ -42,8 +42,7 @@ module.exports = {
                         nextPart = $(this).children(`p:nth-child(${elemNr++})`).text().trim();
                     }
                     var quoteAuthor = 'Voi Vitsi';
-                    //Quote has quotation marks around it and propably something unwanted after last. Getting rid of those
-                    console.log(quoteText);
+
                     var id = utils.createHash(quoteText);
                     results.push({id: id, author: quoteAuthor, quote: quoteText, vendor: 'vitsikirja', quote_length: quoteText.length, times_published: 0});
                 });
