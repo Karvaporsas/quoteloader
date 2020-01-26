@@ -8,6 +8,7 @@ const goodreadsLoader = require('../loaders/goodreadsLoader');
 const database = require('../database');
 const brainyLoader = require('../loaders/brainyquoteLoader');
 const mediawikiLoader = require('../loaders/mediawikiLoader');
+const vitsikirjaLoader = require('../loaders/vitsikirjaLoader');
 
 function _load(operation) {
     return new Promise((resolve, reject) => {
@@ -25,6 +26,9 @@ function _load(operation) {
                 break;
             case 'mediawiki':
                 mediawikiLoader.load(operation, resolve, reject);
+                break;
+            case 'vitsikirja':
+                vitsikirjaLoader.load(operation, resolve, reject);
                 break;
             default:
                 reject({status: 0, message: 'No matching source given'});
