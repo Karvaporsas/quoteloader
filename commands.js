@@ -4,6 +4,7 @@
 
 const loadHandler = require('./handlers/loadHandler');
 const refineHandler = require('./handlers/refineHandler');
+const testHandler = require('./handlers/testHandler');
 
 module.exports = {
     process(command, data) {
@@ -21,6 +22,8 @@ module.exports = {
                 return refineHandler.setTimesPublished();
             case 'insertFromFile':
                 return loadHandler.readFromFile();
+            case 'testInjection':
+                return testHandler.test();
             default:
                 return new Promise((resolve, reject) => {
                     reject('Unknown comand');

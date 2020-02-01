@@ -315,5 +315,33 @@ module.exports = {
                 reject(e);
             });
         });
+    },
+    test() {
+        return new Promise((resolve, reject) => {
+            var id = '4053a3c02e1331f9aeb0952b09ea9534796d4d78 and author = Lewis';
+            var params = {
+                TableName: QUOTES_TABLE,
+                ProjectionExpression: '#author, #id, #quote',
+                FilterExpression: '#id = :id',
+                ExpressionAttributeNames: {
+                    '#author': 'author',
+                    '#id': 'id',
+                    '#quote': 'quote'
+                },
+                ExpressionAttributeValues: {
+                    ':id': id
+                }
+            };
+
+            utils.performScan(dynamoDb, params).then((quotes) => {
+                console.log('found something');
+                console.log(quotes);
+                resolve(quotes);
+            }).catch((e) => {
+                console.log('Error happened');
+                console.log(e);
+                reject(e);
+            });
+        });
     }
 };
