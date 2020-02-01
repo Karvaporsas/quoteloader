@@ -318,7 +318,7 @@ module.exports = {
     },
     test() {
         return new Promise((resolve, reject) => {
-            var id = '4053a3c02e1331f9aeb0952b09ea9534796d4d78 and author = Lewis';
+            var id = 'test and author = Lewis';
             var params = {
                 TableName: QUOTES_TABLE,
                 ProjectionExpression: '#author, #id, #quote',
