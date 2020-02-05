@@ -19,7 +19,6 @@ exports.handler = (event, context) => {
     var command = event.command;
 
     commands.process(command, event).then((result) => {
-        console.log(result);
         context.succeed(result);
     }).catch((e) => {
         console.log('Error while loading');

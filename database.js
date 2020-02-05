@@ -9,9 +9,18 @@ const OPERATIONS_TABLE = process.env.TABLE_OPERATIONS;
 const DEBUG_MODE = process.env.DEBUG_MODE === 'ON';
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
+function _insertQuotePromise(quote, self, insertedQuotes) {
+    return self.insertQuote(quote).then((res) => {
+        if (res) insertedQuotes.push(res);
+
+        return res;
+    });
+}
+
 module.exports = {
     insertQuotes(quotes) {
         return new Promise((resolve, reject) => {
+            var insertedQuotes = [];
             if (!quotes.length) {
                 if (DEBUG_MODE) {
                     console.log('No quotes to store!');
@@ -20,11 +29,11 @@ module.exports = {
             } else {
                 var promises = [];
                 for (const quote of quotes) {
-                    promises.push(this.insertQuote(quote));
+                    promises.push(_insertQuotePromise(quote, this, insertedQuotes));
                 }
 
                 Promise.all(promises).then(() => {
-                    resolve({status: 1, message: 'quotes inserted', quotes: quotes});
+                    resolve({status: 1, message: 'quotes inserted', quotes: insertedQuotes});
                 }).catch((e) => {
                     console.log('Error inserting quotes');
                     console.log(e);
@@ -37,14 +46,17 @@ module.exports = {
         return new Promise((resolve, reject) => {
             const params = {
                 TableName: QUOTES_TABLE,
-                Item: quote
+                Item: quote,
+                ConditionExpression: 'attribute_not_exists(id)'
             };
 
             dynamoDb.put(params, function (err) {
-                if (err) {
+                if (err && err.code !== 'ConditionalCheckFailedException') {
                     console.log(`Error inserting quote ${quote.id}`);
                     console.log(err);
                     reject(err);
+                } else if (err && err.code === 'ConditionalCheckFailedException') {
+                    resolve();
                 } else {
                     resolve(quote);
                 }

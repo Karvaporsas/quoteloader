@@ -30,9 +30,7 @@ module.exports = {
     load(quotes) {
         return new Promise((resolve, reject) => {
             if (DEBUG_MODE) {
-                console.log(
-                    quotes
-                );
+                console.log(quotes);
             }
 
             if(!quotes.length) {

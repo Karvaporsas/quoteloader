@@ -1,5 +1,7 @@
 {
     "quotes": [
-        {"author": "Jordan B. Peterson", "quote": "If you haven't done anything wrong, do not apologize.", "reviewed": 1}
+        {"author": "Jordan B. Peterson", "quote": "If you haven't done anything wrong, do not apologize.", "reviewed": 1},
+        {"author": "Jordan B. Peterson", "quote": "If you can't make your enemy reprehensible along some dimension, you have to contend with them seriously.", "reviewed": 1},
+        {"author": "test", "quote": "supertest", "reviewed": 0}
     ]
 }
